@@ -1,0 +1,10 @@
+# Default initial positions for engineer_total's ros2_control fake system
+
+initial_positions:
+  J1_joint: 0
+  J2_joint: 0
+  J3_joint: 0
+  J4_joint: 0
+  J5_joint: 0
+  J6_joint: 0
+  chassis: 0

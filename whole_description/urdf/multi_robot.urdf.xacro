@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="multi_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+    <!-- 统一的 root link -->
+    <link name="root_link"/>
+
+    <!-- 1. 载入第一个机器人 (带底盘机械臂) -->
+    <xacro:include filename="$(find engineer_description)/urdf/engineer_total.urdf.xacro"/>
+    <joint name="chassis" type="planar">
+        <parent link="root_link"/>
+        <child link="footprint_link"/>
+        <origin xyz="0.38 0.60 0" rpy="0 0 2.355"/>
+    </joint>
+
+    <!-- 2. 载入第二个机器人 (固定机械臂 + 箱子) -->
+    <xacro:include filename="$(find station_description)/urdf/exchange_station_whole_description.urdf.xacro"/>
+    <joint name="robot2_fixed_joint" type="fixed">
+        <parent link="root_link"/>
+        <child link="base_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+</robot>

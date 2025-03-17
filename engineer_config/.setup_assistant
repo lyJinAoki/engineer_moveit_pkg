@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: engineer_description
+    relative_path: urdf/engineer_total.urdf
+  srdf:
+    relative_path: config/engineer_total.srdf
+  package_settings:
+    author_name: ly_jin
+    author_email: ly_jin@sjtu.edu.cn
+    generated_timestamp: 1740992554
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
