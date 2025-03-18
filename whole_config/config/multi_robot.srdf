@@ -64,12 +64,8 @@
     <disable_collisions link1="J0" link2="Wheel_r_b" reason="Never"/>
     <disable_collisions link1="J0" link2="Wheel_r_f" reason="Never"/>
     <disable_collisions link1="J0" link2="base_Link" reason="Adjacent"/>
-    <disable_collisions link1="J0" link2="base_link" reason="Never"/>
     <disable_collisions link1="J0" link2="footprint_link" reason="Never"/>
     <disable_collisions link1="J0" link2="link0" reason="Never"/>
-    <disable_collisions link1="J0" link2="link1" reason="Never"/>
-    <disable_collisions link1="J0" link2="link2" reason="Never"/>
-    <disable_collisions link1="J0" link2="link5" reason="Never"/>
     <disable_collisions link1="J1" link2="J2" reason="Adjacent"/>
     <disable_collisions link1="J1" link2="J3" reason="Never"/>
     <disable_collisions link1="J1" link2="Wheel_l_b" reason="Never"/>
@@ -77,13 +73,8 @@
     <disable_collisions link1="J1" link2="Wheel_r_b" reason="Never"/>
     <disable_collisions link1="J1" link2="Wheel_r_f" reason="Never"/>
     <disable_collisions link1="J1" link2="base_Link" reason="Never"/>
-    <disable_collisions link1="J1" link2="base_link" reason="Never"/>
     <disable_collisions link1="J1" link2="footprint_link" reason="Never"/>
     <disable_collisions link1="J1" link2="link0" reason="Never"/>
-    <disable_collisions link1="J1" link2="link1" reason="Never"/>
-    <disable_collisions link1="J1" link2="link2" reason="Never"/>
-    <disable_collisions link1="J1" link2="link3" reason="Never"/>
-    <disable_collisions link1="J1" link2="link5" reason="Never"/>
     <disable_collisions link1="J2" link2="J3" reason="Adjacent"/>
     <disable_collisions link1="J2" link2="J4" reason="Never"/>
     <disable_collisions link1="J2" link2="J5" reason="Never"/>
@@ -94,9 +85,6 @@
     <disable_collisions link1="J2" link2="Wheel_r_f" reason="Never"/>
     <disable_collisions link1="J2" link2="base_Link" reason="Never"/>
     <disable_collisions link1="J2" link2="footprint_link" reason="Never"/>
-    <disable_collisions link1="J2" link2="link0" reason="Never"/>
-    <disable_collisions link1="J2" link2="link1" reason="Never"/>
-    <disable_collisions link1="J2" link2="link2" reason="Never"/>
     <disable_collisions link1="J3" link2="J4" reason="Adjacent"/>
     <disable_collisions link1="J3" link2="J5" reason="Never"/>
     <disable_collisions link1="J3" link2="J6" reason="Never"/>
@@ -106,32 +94,14 @@
     <disable_collisions link1="J3" link2="Wheel_r_f" reason="Never"/>
     <disable_collisions link1="J3" link2="base_Link" reason="Never"/>
     <disable_collisions link1="J3" link2="footprint_link" reason="Never"/>
-    <disable_collisions link1="J3" link2="link0" reason="Never"/>
-    <disable_collisions link1="J3" link2="link1" reason="Never"/>
-    <disable_collisions link1="J3" link2="link5" reason="Never"/>
     <disable_collisions link1="J3" link2="mine_link" reason="Never"/>
     <disable_collisions link1="J4" link2="J5" reason="Adjacent"/>
     <disable_collisions link1="J4" link2="J6" reason="Never"/>
     <disable_collisions link1="J4" link2="footprint_link" reason="Never"/>
-    <disable_collisions link1="J4" link2="link0" reason="Never"/>
-    <disable_collisions link1="J4" link2="link1" reason="Never"/>
-    <disable_collisions link1="J4" link2="link2" reason="Never"/>
-    <disable_collisions link1="J4" link2="mine_link" reason="Never"/>
     <disable_collisions link1="J5" link2="J6" reason="Adjacent"/>
     <disable_collisions link1="J5" link2="footprint_link" reason="Never"/>
-    <disable_collisions link1="J5" link2="link0" reason="Never"/>
-    <disable_collisions link1="J5" link2="link1" reason="Never"/>
-    <disable_collisions link1="J5" link2="link2" reason="Never"/>
-    <disable_collisions link1="J5" link2="link3" reason="Never"/>
-    <disable_collisions link1="J5" link2="link4" reason="Never"/>
-    <disable_collisions link1="J5" link2="link6" reason="Never"/>
     <disable_collisions link1="J5" link2="mine_link" reason="Default"/>
     <disable_collisions link1="J6" link2="footprint_link" reason="Never"/>
-    <disable_collisions link1="J6" link2="link0" reason="Never"/>
-    <disable_collisions link1="J6" link2="link1" reason="Never"/>
-    <disable_collisions link1="J6" link2="link2" reason="Never"/>
-    <disable_collisions link1="J6" link2="link3" reason="Never"/>
-    <disable_collisions link1="J6" link2="link4" reason="Never"/>
     <disable_collisions link1="J6" link2="mine_link" reason="Adjacent"/>
     <disable_collisions link1="Wheel_l_b" link2="Wheel_l_f" reason="Never"/>
     <disable_collisions link1="Wheel_l_b" link2="Wheel_r_b" reason="Never"/>
@@ -139,34 +109,20 @@
     <disable_collisions link1="Wheel_l_b" link2="base_Link" reason="Adjacent"/>
     <disable_collisions link1="Wheel_l_b" link2="footprint_link" reason="Never"/>
     <disable_collisions link1="Wheel_l_b" link2="link0" reason="Never"/>
-    <disable_collisions link1="Wheel_l_b" link2="link1" reason="Never"/>
-    <disable_collisions link1="Wheel_l_b" link2="link2" reason="Never"/>
-    <disable_collisions link1="Wheel_l_b" link2="link3" reason="Never"/>
-    <disable_collisions link1="Wheel_l_b" link2="link4" reason="Never"/>
-    <disable_collisions link1="Wheel_l_b" link2="link5" reason="Never"/>
     <disable_collisions link1="Wheel_l_f" link2="Wheel_r_b" reason="Never"/>
     <disable_collisions link1="Wheel_l_f" link2="Wheel_r_f" reason="Never"/>
     <disable_collisions link1="Wheel_l_f" link2="base_Link" reason="Adjacent"/>
     <disable_collisions link1="Wheel_l_f" link2="footprint_link" reason="Never"/>
     <disable_collisions link1="Wheel_l_f" link2="link0" reason="Never"/>
-    <disable_collisions link1="Wheel_l_f" link2="link1" reason="Never"/>
-    <disable_collisions link1="Wheel_l_f" link2="link2" reason="Never"/>
     <disable_collisions link1="Wheel_r_b" link2="Wheel_r_f" reason="Never"/>
     <disable_collisions link1="Wheel_r_b" link2="base_Link" reason="Adjacent"/>
     <disable_collisions link1="Wheel_r_b" link2="footprint_link" reason="Never"/>
     <disable_collisions link1="Wheel_r_b" link2="link0" reason="Never"/>
-    <disable_collisions link1="Wheel_r_b" link2="link1" reason="Never"/>
-    <disable_collisions link1="Wheel_r_b" link2="link2" reason="Never"/>
     <disable_collisions link1="Wheel_r_f" link2="base_Link" reason="Adjacent"/>
     <disable_collisions link1="Wheel_r_f" link2="footprint_link" reason="Never"/>
     <disable_collisions link1="Wheel_r_f" link2="link0" reason="Never"/>
-    <disable_collisions link1="Wheel_r_f" link2="link1" reason="Never"/>
-    <disable_collisions link1="Wheel_r_f" link2="link5" reason="Never"/>
-    <disable_collisions link1="base_Link" link2="base_link" reason="Default"/>
     <disable_collisions link1="base_Link" link2="footprint_link" reason="Adjacent"/>
     <disable_collisions link1="base_Link" link2="link0" reason="Never"/>
-    <disable_collisions link1="base_Link" link2="link1" reason="Never"/>
-    <disable_collisions link1="base_Link" link2="link2" reason="Never"/>
     <disable_collisions link1="base_link" link2="footprint_link" reason="Adjacent"/>
     <disable_collisions link1="base_link" link2="link0" reason="Adjacent"/>
     <disable_collisions link1="base_link" link2="mine_link" reason="Default"/>
@@ -178,7 +134,6 @@
     <disable_collisions link1="footprint_link" link2="link5" reason="Never"/>
     <disable_collisions link1="footprint_link" link2="link6" reason="Never"/>
     <disable_collisions link1="link0" link2="link1" reason="Adjacent"/>
-    <disable_collisions link1="link0" link2="mine_link" reason="Never"/>
     <disable_collisions link1="link1" link2="link2" reason="Adjacent"/>
     <disable_collisions link1="link2" link2="link3" reason="Adjacent"/>
     <disable_collisions link1="link3" link2="link4" reason="Adjacent"/>
