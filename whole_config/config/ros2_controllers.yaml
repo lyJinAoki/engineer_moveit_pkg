@@ -6,11 +6,6 @@ controller_manager:
     arm_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
-
-    chassis_controller:
-      type: joint_trajectory_controller/JointTrajectoryController
-
-
     station_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
@@ -21,6 +16,9 @@ controller_manager:
 arm_controller:
   ros__parameters:
     joints:
+      - chassis_x
+      - chassis_y
+      - chassis_theta
       - J0_joint
       - J1_joint
       - J2_joint
@@ -28,16 +26,6 @@ arm_controller:
       - J4_joint
       - J5_joint
       - J6_joint
-    command_interfaces:
-      - position
-    state_interfaces:
-      - position
-      - velocity
-    allow_nonzero_velocity_at_trajectory_end: true
-chassis_controller:
-  ros__parameters:
-    joints:
-      - chassis
     command_interfaces:
       - position
     state_interfaces:

@@ -7,11 +7,50 @@
 
     <!-- 1. 载入第一个机器人 (带底盘机械臂) -->
     <xacro:include filename="$(find engineer_description)/urdf/engineer_total.urdf.xacro"/>
-    <joint name="chassis" type="planar">
+    
+    <!-- 沿 X 轴的棱柱关节 -->
+    <joint name="chassis_x" type="prismatic">
         <parent link="root_link"/>
-        <child link="footprint_link"/>
-        <origin xyz="0.38 0.60 0" rpy="0 0 2.355"/>
+        <child link="chassis_x_link"/>
+        <axis xyz="1 0 0"/> <!-- 沿 X 轴 -->
+        <limit lower="-1.0" upper="1.0" effort="100.0" velocity="10.0"/> <!-- 根据需要调整范围 -->
+        <origin xyz="0.34 0.51 0" rpy="0 0 3.1415"/>
     </joint>
+    <link
+    name="chassis_x_link">
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+    </visual>
+   </link>
+
+    <!-- 沿 Y 轴的棱柱关节 -->
+    <joint name="chassis_y" type="prismatic">
+        <parent link="chassis_x_link"/>
+        <child link="chassis_y_link"/>
+        <axis xyz="0 1 0"/> <!-- 沿 Y 轴 -->
+        <limit lower="-1.0" upper="1.0" effort="100.0" velocity="10.0"/> <!-- 根据需要调整范围 -->
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+    <link
+    name="chassis_y_link">
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+    </visual>
+   </link>
+
+    <!-- 绕 Z 轴的旋转关节 -->
+    <joint name="chassis_theta" type="revolute">
+        <parent link="chassis_y_link"/>
+        <child link="footprint_link"/>
+        <axis xyz="0 0 1"/> <!-- 绕 Z 轴 -->
+        <limit lower="-3.1415" upper="3.1415" effort="100.0" velocity="10.0"/> <!-- 根据需要调整范围 -->
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
 
     <!-- 2. 载入第二个机器人 (固定机械臂 + 箱子) -->
     <xacro:include filename="$(find station_description)/urdf/exchange_station_whole_description.urdf.xacro"/>

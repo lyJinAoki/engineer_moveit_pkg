@@ -18,7 +18,7 @@ public:
         try {
             // Initialize MoveGroupInterfaces for arm, chassis, and station
             arm_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(shared_from_this(), "arm");
-            chassis_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(shared_from_this(), "chassis");
+            // chassis_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(shared_from_this(), "chassis");
             station_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(shared_from_this(), "station");
             RCLCPP_INFO(this->get_logger(), "MoveGroupInterfaces initialized successfully.");
 
@@ -26,8 +26,8 @@ public:
             arm_group_->setPlanningTime(2.0); // 设置规划时间
             arm_group_->setNumPlanningAttempts(50); // 设置规划尝试次数
             arm_group_->setGoalJointTolerance(5.0e-2); // 设置关节目标容差
-            arm_group_->setGoalPositionTolerance(5.0e-2); // 设置位置目标容差
-            arm_group_->setGoalOrientationTolerance(5.0e-2); // 设置姿态目标容差
+            arm_group_->setGoalPositionTolerance(1.0e-2); // 设置位置目标容差
+            arm_group_->setGoalOrientationTolerance(1.0e-2); // 设置姿态目标容差
 
             // Set parameters for station_group_
             station_group_->setPlanningTime(10.0); // 设置规划时间
@@ -203,7 +203,7 @@ public:
 
 private:
     std::shared_ptr<moveit::planning_interface::MoveGroupInterface> arm_group_;
-    std::shared_ptr<moveit::planning_interface::MoveGroupInterface> chassis_group_;
+    // std::shared_ptr<moveit::planning_interface::MoveGroupInterface> chassis_group_;
     std::shared_ptr<moveit::planning_interface::MoveGroupInterface> station_group_;
 };
 
