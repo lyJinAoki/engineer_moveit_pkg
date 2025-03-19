@@ -2,6 +2,8 @@
 #include <moveit/move_group_interface/move_group_interface.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <moveit/robot_state/robot_state.hpp>
+#include <thread>
+#include <atomic>
 
 
 class MultiRobotPlanner : public rclcpp::Node
@@ -10,15 +12,31 @@ public:
     MultiRobotPlanner() : Node("multi_robot_planner")
     {
         RCLCPP_INFO(this->get_logger(), "MultiRobotPlanner node created.");
+        
+        // 创建一个单独的线程来运行事件循环
+        event_loop_thread_ = std::thread([this]() {
+            while (is_running_ && rclcpp::ok()) {
+                rclcpp::spin_some(this->shared_from_this());
+            }
+        });
     }
 
+    ~MultiRobotPlanner()
+    {
+        // 停止事件循环线程
+        is_running_ = false;
+        if (event_loop_thread_.joinable()) {
+            event_loop_thread_.join();
+        }
+    }
+    
     void initializeMoveGroups()
     {
         RCLCPP_INFO(this->get_logger(), "Initializing MoveGroupInterfaces.");
         try {
             // Initialize MoveGroupInterfaces for arm, chassis, and station
             arm_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(shared_from_this(), "arm");
-            // chassis_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(shared_from_this(), "chassis");
+            whole_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(shared_from_this(), "whole");
             station_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(shared_from_this(), "station");
             RCLCPP_INFO(this->get_logger(), "MoveGroupInterfaces initialized successfully.");
 
@@ -28,6 +46,13 @@ public:
             arm_group_->setGoalJointTolerance(5.0e-2); // 设置关节目标容差
             arm_group_->setGoalPositionTolerance(1.0e-2); // 设置位置目标容差
             arm_group_->setGoalOrientationTolerance(1.0e-2); // 设置姿态目标容差
+
+            // Set parameters for whole_group_
+            whole_group_->setPlanningTime(10.0); // 设置规划时间
+            whole_group_->setNumPlanningAttempts(50); // 设置规划尝试次数
+            whole_group_->setGoalJointTolerance(0.1); // 设置关节目标容差
+            whole_group_->setGoalPositionTolerance(0.1); // 设置位置目标容差
+            whole_group_->setGoalOrientationTolerance(0.1); // 设置姿态目标容差
 
             // Set parameters for station_group_
             station_group_->setPlanningTime(10.0); // 设置规划时间
@@ -59,9 +84,9 @@ public:
         // Create the target pose
         geometry_msgs::msg::PoseStamped target_pose;
         if (group_name == "station"){
-            target_pose.header.frame_id = "root_link";
+            target_pose.header.frame_id = "J1";
         } else if (group_name == "arm"){
-            target_pose.header.frame_id = "root_link";
+            target_pose.header.frame_id = "J1";
         }
         target_pose.pose.position.x = x;
         target_pose.pose.position.y = y;
@@ -153,10 +178,8 @@ public:
         }
     }
 
-    bool executePushInMotion(const std::string &group_name)
+    bool executePushInMotion(const geometry_msgs::msg::PoseStamped &pre_pushin_pose)
     {
-        // 获取用户输入的 pre_pushin 目标位姿
-        geometry_msgs::msg::PoseStamped pre_pushin_pose = getUserInput(group_name);
 
         // 计算 push_in 目标位姿：沿末端执行器的 x 轴方向移动 20 cm
         double offset = -0.13; // 13 cm
@@ -179,32 +202,88 @@ public:
             return false;
         }
     }
-    // bool moveBaseAndReplan(const geometry_msgs::msg::PoseStamped &target_pose)
-    // {
-    //     RCLCPP_WARN(this->get_logger(), "机械臂路径规划失败，尝试移动底盘...");
-    //     if (!chassis_group_) {
-    //         RCLCPP_ERROR(this->get_logger(), "MoveGroupInterface for chassis is not initialized.");
-    //         return false;
-    //     }
 
-    //     chassis_group_->setRandomTarget();
-    //     moveit::planning_interface::MoveGroupInterface::Plan base_plan;
+    bool moveBaseAndReplan(const geometry_msgs::msg::PoseStamped &target_pose)
+    {
+        RCLCPP_WARN(this->get_logger(), "机械臂路径规划失败，尝试移动底盘...");
+        if (!whole_group_) {
+            RCLCPP_ERROR(this->get_logger(), "MoveGroupInterface for chassis is not initialized.");
+            return false;
+        }
 
-    //     bool success = (chassis_group_->plan(base_plan) == moveit::core::MoveItErrorCode::SUCCESS);
-    //     if (success) {
-    //         RCLCPP_INFO(this->get_logger(), "底盘移动成功！");
-    //         chassis_group_->execute(base_plan);
-    //         return planArmMotion(target_pose);
-    //     } else {
-    //         RCLCPP_ERROR(this->get_logger(), "底盘移动失败！");
-    //         return false;
-    //     }
-    // }
+        // 设置底盘的目标位置
+        whole_group_->setPoseTarget(target_pose.pose);
+        moveit::planning_interface::MoveGroupInterface::Plan base_plan;
+        bool success = (whole_group_->plan(base_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+        if (success) {
+            RCLCPP_INFO(this->get_logger(), "底盘移动成功！");
+
+            // 获取当前关节状态
+            auto current_state = whole_group_->getCurrentState();
+            if (!current_state) {
+                RCLCPP_ERROR(this->get_logger(), "Failed to get current state!");
+                return false;
+            }
+
+            // 打印当前关节状态
+            RCLCPP_INFO(this->get_logger(), "我成功getCurrentState了，yeah");
+            std::vector<std::string> joint_names = whole_group_->getJointNames();
+            std::vector<double> joint_values;
+            current_state->copyJointGroupPositions("whole", joint_values);
+            
+            // 过滤轨迹点
+            std::vector<std::string> chassis_joints = {"chassis_x", "chassis_y", "chassis_theta"};
+            std::vector<trajectory_msgs::msg::JointTrajectoryPoint> new_trajectory_points;
+            for (const auto& point : base_plan.trajectory.joint_trajectory.points) {
+                trajectory_msgs::msg::JointTrajectoryPoint new_point;
+                for (const auto& joint : joint_names) {
+                    auto index = std::distance(base_plan.trajectory.joint_trajectory.joint_names.begin(),
+                                            std::find(base_plan.trajectory.joint_trajectory.joint_names.begin(),
+                                                        base_plan.trajectory.joint_trajectory.joint_names.end(), joint));
+                    if (std::find(chassis_joints.begin(), chassis_joints.end(), joint) != chassis_joints.end()) {
+                        // 如果是底盘关节，保留速度和加速度
+                        new_point.positions.push_back(point.positions[index]);
+                        if (!point.velocities.empty()) {
+                            new_point.velocities.push_back(point.velocities[index]);
+                        } else {
+                            new_point.velocities.push_back(0.0); // 如果原始轨迹没有速度信息，设置为0
+                        }
+                        if (!point.accelerations.empty()) {
+                            new_point.accelerations.push_back(point.accelerations[index]);
+                        } else {
+                            new_point.accelerations.push_back(0.0); // 如果原始轨迹没有加速度信息，设置为0
+                        }
+                    } else {
+                        // 如果不是底盘关节，使用当前关节状态
+                        new_point.positions.push_back(current_state->getVariablePosition(joint));
+                        new_point.velocities.push_back(0.0); // 设置速度为0
+                        new_point.accelerations.push_back(0.0); // 设置加速度为0
+                    }
+                }
+                new_trajectory_points.push_back(new_point);
+            }
+
+            // 更新 base_plan 轨迹
+            base_plan.trajectory.joint_trajectory.joint_names = joint_names;
+            base_plan.trajectory.joint_trajectory.points = new_trajectory_points;  
+            
+            // 执行修改后的轨迹
+            RCLCPP_INFO(this->get_logger(), "Executing modified trajectory...");
+            whole_group_->execute(base_plan);
+            return planArmMotion(target_pose);
+        } else {
+            RCLCPP_ERROR(this->get_logger(), "底盘移动失败！");
+            return false;
+        }
+    }
+
 
 private:
     std::shared_ptr<moveit::planning_interface::MoveGroupInterface> arm_group_;
-    // std::shared_ptr<moveit::planning_interface::MoveGroupInterface> chassis_group_;
+    std::shared_ptr<moveit::planning_interface::MoveGroupInterface> whole_group_;
     std::shared_ptr<moveit::planning_interface::MoveGroupInterface> station_group_;
+    std::thread event_loop_thread_;
+    std::atomic<bool> is_running_{true};
 };
 
 
@@ -221,14 +300,17 @@ int main(int argc, char **argv)
 
     // Step 2: Plan station motion
     if (node->planStationMotion(station_target_pose)) {
+
         // Step 3: Get arm target pose from user input
+        auto arm_target_pose = node->getUserInput("arm");
 
         // Step 4: Execute push-in motion (pre_pushin + push_in)
-        if (!node->executePushInMotion("arm")) {
+        if (!node->executePushInMotion(arm_target_pose)) {
             RCLCPP_ERROR(node->get_logger(), "机械臂 push-in 动作失败，开始移动底盘");
-            // if (!node->moveBaseAndReplan(arm_target_pose)) {
-            //     RCLCPP_ERROR(node->get_logger(), "底盘移动失败，任务终止。");
-            // }
+
+            if (!node->moveBaseAndReplan(arm_target_pose)) {
+                RCLCPP_ERROR(node->get_logger(), "底盘移动失败，任务终止。");
+            }
         }
     } else {
         RCLCPP_ERROR(node->get_logger(), "兑换站路径规划失败，任务终止。");

@@ -9,19 +9,11 @@
     <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
-    <group name="arm">
+    <group name="whole">
         <joint name="chassis_x"/>
         <joint name="chassis_y"/>
         <joint name="chassis_theta"/>
-        <joint name="J0_joint"/>
-        <joint name="J1_joint"/>
-        <joint name="J2_joint"/>
-        <joint name="J3_joint"/>
-        <joint name="J4_joint"/>
-        <joint name="J5_joint"/>
-        <joint name="J6_joint"/>
-        <joint name="mine_joint"/>
-        <joint name="endface_joint"/>
+        <group name="arm"/>
     </group>
     <group name="station">
         <joint name="j0"/>
@@ -33,19 +25,18 @@
         <joint name="j6"/>
         <joint name="end_joint"/>
     </group>
+    <group name="arm">
+        <joint name="J0_joint"/>
+        <joint name="J1_joint"/>
+        <joint name="J2_joint"/>
+        <joint name="J3_joint"/>
+        <joint name="J4_joint"/>
+        <joint name="J5_joint"/>
+        <joint name="J6_joint"/>
+        <joint name="mine_joint"/>
+        <joint name="endface_joint"/>
+    </group>
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
-    <group_state name="arm_home" group="arm">
-        <joint name="chassis_x" value="0"/>
-        <joint name="chassis_y" value="0"/>
-        <joint name="chassis_theta" value="0"/>
-        <joint name="J0_joint" value="0"/>
-        <joint name="J1_joint" value="0"/>
-        <joint name="J2_joint" value="0"/>
-        <joint name="J3_joint" value="0"/>
-        <joint name="J4_joint" value="0"/>
-        <joint name="J5_joint" value="3.14"/>
-        <joint name="J6_joint" value="0"/>
-    </group_state>
     <group_state name="station_home" group="station">
         <joint name="j0" value="0"/>
         <joint name="j1" value="0"/>
@@ -55,7 +46,6 @@
         <joint name="j5" value="0"/>
         <joint name="j6" value="0.1381"/>
     </group_state>
-
         <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="J0" link2="J1" reason="Adjacent"/>
     <disable_collisions link1="J0" link2="J2" reason="Never"/>

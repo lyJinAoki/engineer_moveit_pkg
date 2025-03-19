@@ -4,12 +4,22 @@ moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControll
 
 moveit_simple_controller_manager:
   controller_names:
-    - arm_controller
     - station_controller
+    - whole_controller
 
-  arm_controller:
+  station_controller:
+    type: FollowJointTrajectory
+    joints:
+      - j0
+      - j1
+      - j2
+      - j3
+      - j4
+      - j5
+      - j6
     action_ns: follow_joint_trajectory
     default: true
+  whole_controller:
     type: FollowJointTrajectory
     joints:
       - chassis_x
@@ -22,16 +32,5 @@ moveit_simple_controller_manager:
       - J4_joint
       - J5_joint
       - J6_joint
-
-  station_controller:
     action_ns: follow_joint_trajectory
     default: true
-    type: FollowJointTrajectory
-    joints:
-      - j0
-      - j1
-      - j2
-      - j3
-      - j4
-      - j5
-      - j6
