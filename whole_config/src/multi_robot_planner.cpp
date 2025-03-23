@@ -218,55 +218,84 @@ public:
         if (success) {
             RCLCPP_INFO(this->get_logger(), "底盘移动成功！");
 
-            // 获取当前关节状态
-            auto current_state = whole_group_->getCurrentState();
-            if (!current_state) {
-                RCLCPP_ERROR(this->get_logger(), "Failed to get current state!");
-                return false;
+            // // 获取当前关节状态
+            // auto current_state = whole_group_->getCurrentState();
+            // if (!current_state) {
+            //     RCLCPP_ERROR(this->get_logger(), "Failed to get current state!");
+            //     return false;
+            // }
+
+            // // 打印当前关节状态
+            // RCLCPP_INFO(this->get_logger(), "我成功getCurrentState了，yeah");
+            // std::vector<std::string> joint_names = whole_group_->getJointNames();
+            // std::vector<double> joint_values;
+            // current_state->copyJointGroupPositions("whole", joint_values);
+            
+            // // 过滤轨迹点
+            // std::vector<std::string> chassis_joints = {"chassis_x", "chassis_y", "chassis_theta"};
+            // std::vector<trajectory_msgs::msg::JointTrajectoryPoint> new_trajectory_points;
+            // for (const auto& point : base_plan.trajectory.joint_trajectory.points) {
+            //     trajectory_msgs::msg::JointTrajectoryPoint new_point;
+            //     for (const auto& joint : joint_names) {
+            //         auto index = std::distance(base_plan.trajectory.joint_trajectory.joint_names.begin(),
+            //                                 std::find(base_plan.trajectory.joint_trajectory.joint_names.begin(),
+            //                                             base_plan.trajectory.joint_trajectory.joint_names.end(), joint));
+            //         if (std::find(chassis_joints.begin(), chassis_joints.end(), joint) != chassis_joints.end()) {
+            //             // 如果是底盘关节，保留速度和加速度
+            //             new_point.positions.push_back(point.positions[index]);
+            //             if (!point.velocities.empty()) {
+            //                 new_point.velocities.push_back(point.velocities[index]);
+            //             } else {
+            //                 new_point.velocities.push_back(0.0); // 如果原始轨迹没有速度信息，设置为0
+            //             }
+            //             if (!point.accelerations.empty()) {
+            //                 new_point.accelerations.push_back(point.accelerations[index]);
+            //             } else {
+            //                 new_point.accelerations.push_back(0.0); // 如果原始轨迹没有加速度信息，设置为0
+            //             }
+            //         } else {
+            //             // 如果不是底盘关节，使用当前关节状态
+            //             new_point.positions.push_back(current_state->getVariablePosition(joint));
+            //             new_point.velocities.push_back(0.0); // 设置速度为0
+            //             new_point.accelerations.push_back(0.0); // 设置加速度为0
+            //         }
+            //     }
+            //     new_trajectory_points.push_back(new_point);
+            // }
+
+            // // 更新 base_plan 轨迹
+            // base_plan.trajectory.joint_trajectory.joint_names = joint_names;
+            // base_plan.trajectory.joint_trajectory.points = new_trajectory_points;  
+            
+            RCLCPP_INFO(this->get_logger(), "Joint Names:");
+            for (const auto& joint : base_plan.trajectory.joint_trajectory.joint_names) {
+                RCLCPP_INFO(this->get_logger(), "- %s", joint.c_str());
             }
 
-            // 打印当前关节状态
-            RCLCPP_INFO(this->get_logger(), "我成功getCurrentState了，yeah");
-            std::vector<std::string> joint_names = whole_group_->getJointNames();
-            std::vector<double> joint_values;
-            current_state->copyJointGroupPositions("whole", joint_values);
-            
-            // 过滤轨迹点
-            std::vector<std::string> chassis_joints = {"chassis_x", "chassis_y", "chassis_theta"};
-            std::vector<trajectory_msgs::msg::JointTrajectoryPoint> new_trajectory_points;
-            for (const auto& point : base_plan.trajectory.joint_trajectory.points) {
-                trajectory_msgs::msg::JointTrajectoryPoint new_point;
-                for (const auto& joint : joint_names) {
-                    auto index = std::distance(base_plan.trajectory.joint_trajectory.joint_names.begin(),
-                                            std::find(base_plan.trajectory.joint_trajectory.joint_names.begin(),
-                                                        base_plan.trajectory.joint_trajectory.joint_names.end(), joint));
-                    if (std::find(chassis_joints.begin(), chassis_joints.end(), joint) != chassis_joints.end()) {
-                        // 如果是底盘关节，保留速度和加速度
-                        new_point.positions.push_back(point.positions[index]);
-                        if (!point.velocities.empty()) {
-                            new_point.velocities.push_back(point.velocities[index]);
-                        } else {
-                            new_point.velocities.push_back(0.0); // 如果原始轨迹没有速度信息，设置为0
-                        }
-                        if (!point.accelerations.empty()) {
-                            new_point.accelerations.push_back(point.accelerations[index]);
-                        } else {
-                            new_point.accelerations.push_back(0.0); // 如果原始轨迹没有加速度信息，设置为0
-                        }
-                    } else {
-                        // 如果不是底盘关节，使用当前关节状态
-                        new_point.positions.push_back(current_state->getVariablePosition(joint));
-                        new_point.velocities.push_back(0.0); // 设置速度为0
-                        new_point.accelerations.push_back(0.0); // 设置加速度为0
+            RCLCPP_INFO(this->get_logger(), "Trajectory Points:");
+            for (size_t i = 0; i < base_plan.trajectory.joint_trajectory.points.size(); i++) {
+                const auto& point = base_plan.trajectory.joint_trajectory.points[i];
+                RCLCPP_INFO(this->get_logger(), "Point %zu:", i);
+                RCLCPP_INFO(this->get_logger(), "  Positions:");
+                for (size_t j = 0; j < point.positions.size(); j++) {
+                    RCLCPP_INFO(this->get_logger(), "    %s: %f", base_plan.trajectory.joint_trajectory.joint_names[j].c_str(), point.positions[j]);
+                }
+                if (!point.velocities.empty()) {
+                    RCLCPP_INFO(this->get_logger(), "  Velocities:");
+                    for (size_t j = 0; j < point.velocities.size(); j++) {
+                        RCLCPP_INFO(this->get_logger(), "    %s: %f", base_plan.trajectory.joint_trajectory.joint_names[j].c_str(), point.velocities[j]);
                     }
                 }
-                new_trajectory_points.push_back(new_point);
+                if (!point.accelerations.empty()) {
+                    RCLCPP_INFO(this->get_logger(), "  Accelerations:");
+                    for (size_t j = 0; j < point.accelerations.size(); j++) {
+                        RCLCPP_INFO(this->get_logger(), "    %s: %f", base_plan.trajectory.joint_trajectory.joint_names[j].c_str(), point.accelerations[j]);
+                    }
+                }
+                double time_from_start = static_cast<double>(point.time_from_start.sec) +
+                                        static_cast<double>(point.time_from_start.nanosec) / 1e9;
+                RCLCPP_INFO(this->get_logger(), "  Time from start: %f", time_from_start);
             }
-
-            // 更新 base_plan 轨迹
-            base_plan.trajectory.joint_trajectory.joint_names = joint_names;
-            base_plan.trajectory.joint_trajectory.points = new_trajectory_points;  
-            
             // 执行修改后的轨迹
             RCLCPP_INFO(this->get_logger(), "Executing modified trajectory...");
             whole_group_->execute(base_plan);
