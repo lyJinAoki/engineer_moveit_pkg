@@ -88,8 +88,3 @@ joint_limits:
     max_velocity: 50.0
     has_acceleration_limits: true
     max_acceleration: 0.5
-  chassis_theta:
-    has_velocity_limits: true
-    max_velocity: 50.0
-    has_acceleration_limits: true
-    max_acceleration: 50.0

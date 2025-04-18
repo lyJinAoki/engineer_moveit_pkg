@@ -24,11 +24,11 @@ def generate_launch_description():
     # publish static_transform
     # 把车转正
     # 没用了，新模型已经正了
-    static_transform_cmd = ExecuteProcess(
-        cmd=['ros2', 'run', 'tf2_ros', 'static_transform_publisher', '--x', '0', '--y', '0', '--z', '0',
-             '--roll', '1.5708', '--pitch', '0', '--yaw', '0', '--frame-id', 'map', '--child-frame-id', 'base_link'],
-        output='screen'
-    )
+    # static_transform_cmd = ExecuteProcess(
+    #     cmd=['ros2', 'run', 'tf2_ros', 'static_transform_publisher', '--x', '0', '--y', '0', '--z', '0',
+    #          '--roll', '1.5708', '--pitch', '0', '--yaw', '0', '--frame-id', 'map', '--child-frame-id', 'base_link'],
+    #     output='screen'
+    # )
     # Use built-in ROS2 URDF launch package with our own arguments
     urdf = IncludeLaunchDescription(
         PathJoinSubstitution([FindPackageShare('urdf_launch'), 'launch', 'display.launch.py']),
@@ -43,5 +43,5 @@ def generate_launch_description():
     launchDescriptionObject.add_action(rviz_arg)
     launchDescriptionObject.add_action(model_arg)
     launchDescriptionObject.add_action(urdf)
-    launchDescriptionObject.add_action(static_transform_cmd)
+    # launchDescriptionObject.add_action(static_transform_cmd)
     return launchDescriptionObject

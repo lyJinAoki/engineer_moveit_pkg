@@ -12,7 +12,6 @@
     <group name="whole">
         <joint name="chassis_x"/>
         <joint name="chassis_y"/>
-        <joint name="chassis_theta"/>
         <group name="arm"/>
     </group>
     <group name="station">

@@ -71,13 +71,6 @@
                 </state_interface>
                 <state_interface name="velocity"/>
             </joint>
-            <joint name="chassis_theta">
-                <command_interface name="position"/>
-                <state_interface name="position">
-                  <param name="initial_value">${initial_positions['chassis_theta']}</param>
-                </state_interface>
-                <state_interface name="velocity"/>
-            </joint>
             <joint name="j0">
                 <command_interface name="position"/>
                 <state_interface name="position">

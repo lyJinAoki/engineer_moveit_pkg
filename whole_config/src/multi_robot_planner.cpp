@@ -2,6 +2,7 @@
 #include <moveit/move_group_interface/move_group_interface.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <moveit/robot_state/robot_state.hpp>
+#include <moveit/planning_scene_interface/planning_scene_interface.hpp>
 #include <thread>
 #include <atomic>
 
@@ -67,6 +68,67 @@ public:
         }
     }
 
+    void addSceneObject()
+    {
+        // 创建PlanningSceneInterface实例
+        moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+
+        // 定义一个碰撞对象
+        moveit_msgs::msg::CollisionObject collision_object;
+        collision_object.header.frame_id = "root_link"; // 假设你的规划框架是"world"
+        collision_object.id = "box1";
+
+        // 定义碰撞对象的形状和尺寸
+        shape_msgs::msg::SolidPrimitive primitive;
+        primitive.type = shape_msgs::msg::SolidPrimitive::BOX;
+        primitive.dimensions.resize(3);
+        primitive.dimensions[shape_msgs::msg::SolidPrimitive::BOX_X] = 0.01;
+        primitive.dimensions[shape_msgs::msg::SolidPrimitive::BOX_Y] = 1.0;
+        primitive.dimensions[shape_msgs::msg::SolidPrimitive::BOX_Z] = 0.8;
+
+        // 定义碰撞对象的姿态
+        geometry_msgs::msg::Pose box_pose;
+        box_pose.orientation.w = 1.0;
+        box_pose.position.x = 0.0;
+        box_pose.position.y = 0.0;
+        box_pose.position.z = 1.0;
+
+        // 将形状和姿态添加到碰撞对象中
+        collision_object.primitives.push_back(primitive);
+        collision_object.primitive_poses.push_back(box_pose);
+
+        // 设置操作为添加
+        collision_object.operation = moveit_msgs::msg::CollisionObject::ADD;
+
+        // 将碰撞对象添加到规划场景中
+        std::vector<moveit_msgs::msg::CollisionObject> collision_objects;
+        collision_objects.push_back(collision_object);
+        planning_scene_interface.applyCollisionObjects(collision_objects);
+
+        RCLCPP_INFO(this->get_logger(), "Collision object added to the planning scene.");
+    }
+
+    void delSceneObject()
+    {
+        // 创建PlanningSceneInterface实例
+        moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+
+        // 定义要删除的碰撞对象ID
+        std::string object_id = "box1";
+
+        // 创建一个空的碰撞对象消息，仅设置ID和操作为删除
+        moveit_msgs::msg::CollisionObject collision_object;
+        collision_object.id = object_id;
+        collision_object.operation = moveit_msgs::msg::CollisionObject::REMOVE;
+
+        // 将碰撞对象添加到向量中并应用
+        std::vector<moveit_msgs::msg::CollisionObject> collision_objects;
+        collision_objects.push_back(collision_object);
+        planning_scene_interface.applyCollisionObjects(collision_objects);
+
+        RCLCPP_INFO(this->get_logger(), "Collision object removed from the planning scene.");
+    }
+
     geometry_msgs::msg::PoseStamped getUserInput(const std::string &group_name)
     {
         RCLCPP_INFO(this->get_logger(), "请输入 %s 的目标位姿（x y z yaw pitch roll）：", group_name.c_str());
@@ -113,6 +175,9 @@ public:
 
     bool planStationMotion(const geometry_msgs::msg::PoseStamped &target_pose)
     {
+        addSceneObject();
+        // // 使用 std::this_thread::sleep_for 暂停当前线程2秒
+        // std::this_thread::sleep_for(std::chrono::seconds(5));
         RCLCPP_INFO(this->get_logger(), "规划 station 路径...");
         if (!station_group_) {
             RCLCPP_ERROR(this->get_logger(), "MoveGroupInterface for station is not initialized.");
@@ -121,6 +186,7 @@ public:
         station_group_->setPoseTarget(target_pose.pose);
         moveit::planning_interface::MoveGroupInterface::Plan plan;
         bool success = (station_group_->plan(plan) == moveit::core::MoveItErrorCode::SUCCESS);
+        delSceneObject();
         if (success) {
             RCLCPP_INFO(this->get_logger(), "station 路径规划成功！");
             station_group_->execute(plan);
@@ -232,7 +298,7 @@ public:
             current_state->copyJointGroupPositions("whole", joint_values);
             
             // 过滤轨迹点
-            std::vector<std::string> chassis_joints = {"chassis_x", "chassis_y", "chassis_theta"};
+            std::vector<std::string> chassis_joints = {"chassis_x", "chassis_y", "J0_joint"};
             std::vector<trajectory_msgs::msg::JointTrajectoryPoint> new_trajectory_points;
             for (const auto& point : base_plan.trajectory.joint_trajectory.points) {
                 trajectory_msgs::msg::JointTrajectoryPoint new_point;
@@ -269,36 +335,7 @@ public:
             base_plan.trajectory.joint_trajectory.joint_names = joint_names;
             base_plan.trajectory.joint_trajectory.points = new_trajectory_points;  
             
-            // RCLCPP_INFO(this->get_logger(), "Joint Names:");
-            // for (const auto& joint : base_plan.trajectory.joint_trajectory.joint_names) {
-            //     RCLCPP_INFO(this->get_logger(), "- %s", joint.c_str());
-            // }
-
-            // RCLCPP_INFO(this->get_logger(), "Trajectory Points:");
-            // for (size_t i = 0; i < base_plan.trajectory.joint_trajectory.points.size(); i++) {
-            //     const auto& point = base_plan.trajectory.joint_trajectory.points[i];
-            //     RCLCPP_INFO(this->get_logger(), "Point %zu:", i);
-            //     RCLCPP_INFO(this->get_logger(), "  Positions:");
-            //     for (size_t j = 0; j < point.positions.size(); j++) {
-            //         RCLCPP_INFO(this->get_logger(), "    %s: %f", base_plan.trajectory.joint_trajectory.joint_names[j].c_str(), point.positions[j]);
-            //     }
-            //     if (!point.velocities.empty()) {
-            //         RCLCPP_INFO(this->get_logger(), "  Velocities:");
-            //         for (size_t j = 0; j < point.velocities.size(); j++) {
-            //             RCLCPP_INFO(this->get_logger(), "    %s: %f", base_plan.trajectory.joint_trajectory.joint_names[j].c_str(), point.velocities[j]);
-            //         }
-            //     }
-            //     if (!point.accelerations.empty()) {
-            //         RCLCPP_INFO(this->get_logger(), "  Accelerations:");
-            //         for (size_t j = 0; j < point.accelerations.size(); j++) {
-            //             RCLCPP_INFO(this->get_logger(), "    %s: %f", base_plan.trajectory.joint_trajectory.joint_names[j].c_str(), point.accelerations[j]);
-            //         }
-            //     }
-            //     double time_from_start = static_cast<double>(point.time_from_start.sec) +
-            //                             static_cast<double>(point.time_from_start.nanosec) / 1e9;
-            //     RCLCPP_INFO(this->get_logger(), "  Time from start: %f", time_from_start);
-            // }
-            // 执行修改后的轨迹
+            printTrajectoryPath(base_plan);
             RCLCPP_INFO(this->get_logger(), "Executing modified trajectory...");
             whole_group_->execute(base_plan);
             return executePushInMotion(target_pose);

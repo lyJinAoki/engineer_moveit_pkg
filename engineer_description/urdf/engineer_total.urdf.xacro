@@ -350,7 +350,7 @@
       link="J0" />
     <axis
       xyz="0 0 1" />
-    <limit
+<limit
       lower="-3.14"
       upper="3.14"
       effort="100"
@@ -641,8 +641,8 @@
     <axis
       xyz="0 0 1" />
     <limit
-      lower="1.31"
-      upper="4.97"
+      lower="1.74"
+      upper="4.54"
       effort="60"
       velocity="5" />
   </joint>
@@ -650,17 +650,17 @@
     name="J6">
     <inertial>
       <origin
-        xyz="-1.23475841270343E-09 4.03415967298315E-09 0.0278757307831412"
+        xyz="2.3269E-11 3.2741E-11 0.14165"
         rpy="0 0 0" />
       <mass
-        value="0.178143267563857" />
+        value="7.7518" />
       <inertia
-        ixx="0.000129094390101851"
-        ixy="1.48506907428467E-08"
-        ixz="2.40814672934691E-11"
-        iyy="0.000129030586750178"
-        iyz="2.41689552037147E-11"
-        izz="7.00687059355998E-05" />
+        ixx="0.048485"
+        ixy="1.4848E-08"
+        ixz="2.045E-11"
+        iyy="0.048485"
+        iyz="5.3943E-12"
+        izz="0.048493" />
     </inertial>
     <visual>
       <origin
@@ -673,7 +673,7 @@
       <material
         name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.89804 0.91765 0.92941 1" />
       </material>
     </visual>
     <collision>
@@ -690,8 +690,8 @@
     name="J6_joint"
     type="revolute">
     <origin
-      xyz="-0.000514233258821717 0.00374244231316156 0.0480008261045562"
-      rpy="1.64994041161029 -1.5707963267949 0" />
+      xyz="-0.00016514 0.0037607 0.048001"
+      rpy="1.5962 -1.5708 0" />
     <parent
       link="J5" />
     <child
@@ -706,75 +706,22 @@
   </joint>
   <link
     name="mine_link">
-    <inertial>
-      <origin
-        xyz="0.00259034918237153 0.000383105433044262 0.102689008639284"
-        rpy="0 0 0" />
-      <mass
-        value="7.49632983624276" />
-      <inertia
-        ixx="0.0469714949950914"
-        ixy="1.85907797157586E-07"
-        ixz="2.41999667470607E-05"
-        iyy="0.0468593512484876"
-        iyz="4.01177085607054E-08"
-        izz="0.0469679528165848" />
-    </inertial>
     <visual>
       <origin
         xyz="0 0 0"
         rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://engineer_description/meshes/end.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
     </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://engineer_description/meshes/end.STL" />
-      </geometry>
-    </collision>
   </link>
   <joint
     name="mine_joint"
     type="fixed">
     <origin
-      xyz="0 0 0.0704957805907174"
-      rpy="0 0 0" />
+      xyz="0 0 0.25"
+      rpy="-1.57 1.57 0" />
     <parent
       link="J6" />
     <child
       link="mine_link" />
-    <axis
-      xyz="0 0 0" />
-  </joint>
-  <link
-    name="endface_link">
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-    </visual>
-  </link>
-  <joint
-    name="endface_joint"
-    type="fixed">
-    <origin
-      xyz="0 0 0.20"
-      rpy="-1.57 1.57 0" />
-    <parent
-      link="mine_link" />
-    <child
-      link="endface_link" />
     <axis
       xyz="0 0 0" />
   </joint>

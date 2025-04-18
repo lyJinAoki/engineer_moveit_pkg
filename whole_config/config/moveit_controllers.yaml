@@ -24,7 +24,6 @@ moveit_simple_controller_manager:
     joints:
       - chassis_x
       - chassis_y
-      - chassis_theta
       - J0_joint
       - J1_joint
       - J2_joint
